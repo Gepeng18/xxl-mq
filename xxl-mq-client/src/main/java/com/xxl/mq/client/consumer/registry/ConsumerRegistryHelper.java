@@ -56,6 +56,7 @@ public class ConsumerRegistryHelper {
         Set<String> registryParamKeyList = new HashSet<>();
 
         for (ConsumerThread consumerThread: consumerThreadList) {
+            // 注册中心中，key是topic，value是group + uuid
             String registryKey = makeRegistryKey(consumerThread.getMqConsumer().topic());
             String registryVal = makeRegistryVal(consumerThread.getMqConsumer().group(), consumerThread.getUuid());
 

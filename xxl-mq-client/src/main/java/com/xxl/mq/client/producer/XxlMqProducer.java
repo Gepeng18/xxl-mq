@@ -87,10 +87,12 @@ public class XxlMqProducer {
      * produce produce
      */
     public static void produce(XxlMqMessage mqMessage, boolean async){
-        // valid
+        // 验证消息有效性
         validMessage(mqMessage);
 
         // send
+        // 这里其实就是将数据放入本地公共的newMessageQueue中
+        // XxlMqClientFactory启动时，创建多个线程，调用代理类xxlMqBroker的addMessages方法，把数据发送出去
         XxlMqClientFactory.addMessages(mqMessage, async);
     }
 

@@ -247,7 +247,7 @@ public class XxlMqBrokerImpl implements IXxlMqBroker, InitializingBean, Disposab
             public void run() {
                 while (!executorStoped) {
                     try {
-                        // mult send alarm
+                        // multi send alarm
                         if (alarmMessageInfo.size() > 0) {
 
                             // copy

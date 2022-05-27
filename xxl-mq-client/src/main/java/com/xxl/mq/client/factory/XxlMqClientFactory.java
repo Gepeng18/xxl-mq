@@ -52,13 +52,17 @@ public class XxlMqClientFactory  {
     public void init() {
 
         // pre : valid consumer
+        // xxlMqClientFactory.setConsumerList(consumerList) 先获取所有spring中的MqConsumer，放入consumerList中
+        // 1、然后这个函数将consumerList中的consumer封装成ConsumerThread放入consumerRespository中
         validConsumer();
 
 
         // start BrokerService
+        // 2、启动多个线程，死循环从MessageQueue中取数据，然后调用代理类xxlMqBroker发送数据
         startBrokerService();
 
         // start consumer
+        // 3、将consumer注册给注册中心，并且启动封装的ConsumerThread
         startConsumer();
 
     }
@@ -109,9 +113,11 @@ public class XxlMqClientFactory  {
     }
     public static void addMessages(XxlMqMessage mqMessage, boolean async){
         if (async) {
-            // async queue, mult send
+            // 异步队列，多个一块发送
+            // async queue, multi send
             newMessageQueue.add(mqMessage);
         } else {
+            // 同步发送，调用broker进行单条发送
             // sync rpc, one send
             xxlMqBroker.addMessages(Arrays.asList(mqMessage));
         }
@@ -121,8 +127,13 @@ public class XxlMqClientFactory  {
         callbackMessageQueue.add(mqMessage);
     }
 
+    /**
+     * 1、创建一个注册中心
+     * 2、启动多个线程，死循环从MessageQueue中取数据，然后调用代理类xxlMqBroker发送数据
+     */
     public void startBrokerService() {
         // init XxlRpcInvokerFactory
+        // 1、应该是创建一个注册中心
         xxlRpcInvokerFactory = new XxlRpcInvokerFactory(XxlRegistryServiceRegistry.class, new HashMap<String, String>(){{
             put(XxlRegistryServiceRegistry.XXL_REGISTRY_ADDRESS, adminAddress);
             put(XxlRegistryServiceRegistry.ACCESS_TOKEN, accessToken);
@@ -134,10 +145,13 @@ public class XxlMqClientFactory  {
         }
 
         // init ConsumerRegistryHelper
+        // 2、将注册中心放入ConsumerRegistryHelper中
         XxlRegistryServiceRegistry commonServiceRegistry = (XxlRegistryServiceRegistry) xxlRpcInvokerFactory.getServiceRegistry();
         consumerRegistryHelper = new ConsumerRegistryHelper(commonServiceRegistry);
 
+        // do 这玩意非常重要
         // init IXxlMqBroker
+        // 3、创建一个IXxlMqBroker的代理类
         xxlMqBroker = (IXxlMqBroker) new XxlRpcReferenceBean(
                 NetEnum.NETTY,
                 Serializer.SerializeEnum.HESSIAN.getSerializer(),
@@ -151,7 +165,7 @@ public class XxlMqClientFactory  {
                 null,
                 xxlRpcInvokerFactory).getObject();
 
-        // async + mult, addMessages
+        // async + multi, addMessages
         for (int i = 0; i < 3; i++) {
             clientFactoryThreadPool.execute(new Runnable() {
                 @Override
@@ -159,12 +173,14 @@ public class XxlMqClientFactory  {
 
                     while (!XxlMqClientFactory.clientFactoryPoolStoped) {
                         try {
+                            // 4、从newMessageQueue中不停地拿数据
                             XxlMqMessage message = newMessageQueue.take();
                             if (message != null) {
                                 // load
                                 List<XxlMqMessage> messageList = new ArrayList<>();
                                 messageList.add(message);
 
+                                // 批量拿100条数据，为空不阻塞
                                 List<XxlMqMessage> otherMessageList = new ArrayList<>();
                                 int drainToNum = newMessageQueue.drainTo(otherMessageList, 100);
                                 if (drainToNum > 0) {
@@ -181,6 +197,7 @@ public class XxlMqClientFactory  {
                         }
                     }
 
+                    // 如果停止运行了，就把内存中所有的newMessageQueue中的数据取出来，然后发送给xxlMqBroker
                     // finally total
                     List<XxlMqMessage> otherMessageList = new ArrayList<>();
                     int drainToNum = newMessageQueue.drainTo(otherMessageList);
@@ -192,14 +209,14 @@ public class XxlMqClientFactory  {
             });
         }
 
-        // async + mult, addMessages
+        // async + multi, addMessages
         for (int i = 0; i < 3; i++) {
             clientFactoryThreadPool.execute(new Runnable() {
                 @Override
                 public void run() {
-
                     while (!XxlMqClientFactory.clientFactoryPoolStoped) {
                         try {
+                            // 1、从callbackMessageQueue中获取回调
                             XxlMqMessage message = callbackMessageQueue.take();
                             if (message != null) {
                                 // load
@@ -213,6 +230,7 @@ public class XxlMqClientFactory  {
                                 }
 
                                 // callback
+                                // 调用xxlMqBroker.callbackMessages
                                 xxlMqBroker.callbackMessages(messageList);
                             }
                         } catch (Exception e) {
@@ -249,6 +267,10 @@ public class XxlMqClientFactory  {
     // queue consumer respository
     private List<ConsumerThread> consumerRespository = new ArrayList<ConsumerThread>();
 
+    /**
+     * 1、如果MqConsumer注解中的group是null，则设置为uuid
+     * 2、将所有MqConsumer封装成线程放入List中
+     */
     private void validConsumer(){
         // valid
         if (consumerList==null || consumerList.size()==0) {
@@ -266,8 +288,9 @@ public class XxlMqClientFactory  {
             }
 
             // valid group
+            // 如果group是null
             if (annotation.group()==null || annotation.group().trim().length()==0) {
-                // empty group means consume broadcase message, will replace by uuid
+                // empty group means consume broadcast message, will replace by uuid
                 try {
                     // annotation memberValues
                     InvocationHandler invocationHandler = Proxy.getInvocationHandler(annotation);
@@ -305,6 +328,7 @@ public class XxlMqClientFactory  {
         }
 
         // registry consumer
+        // 将consumer注册给注册中心，并且服务发现一下
         getConsumerRegistryHelper().registerConsumer(consumerRespository);
 
         // execute thread

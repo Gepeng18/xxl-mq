@@ -45,6 +45,7 @@ public class ConsumerThread extends Thread {
         return uuid;
     }
 
+    // consumer的处理逻辑
     @Override
     public void run() {
 
