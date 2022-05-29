@@ -26,14 +26,14 @@ import java.util.concurrent.TimeoutException;
 public class ConsumerThread extends Thread {
     private final static Logger logger = LoggerFactory.getLogger(ConsumerThread.class);
 
-    private IMqConsumer consumerHandler;
+    private IMqConsumer iMqConsumer;
     private MqConsumer mqConsumer;
 
     private String uuid;
 
-    public ConsumerThread(IMqConsumer consumerHandler) {
-        this.consumerHandler = consumerHandler;
-        this.mqConsumer = consumerHandler.getClass().getAnnotation(MqConsumer.class);
+    public ConsumerThread(IMqConsumer iMqConsumer) {
+        this.iMqConsumer = iMqConsumer;
+        this.mqConsumer = iMqConsumer.getClass().getAnnotation(MqConsumer.class);
 
         this.uuid = UUID.randomUUID().toString().replaceAll("-", "");
     }
@@ -102,7 +102,7 @@ public class ConsumerThread extends Thread {
                                         FutureTask<MqResult> futureTask = new FutureTask<MqResult>(new Callable<MqResult>() {
                                             @Override
                                             public MqResult call() throws Exception {
-                                                return consumerHandler.consume(msg.getData());
+                                                return iMqConsumer.consume(msg.getData());
                                             }
                                         });
                                         futureThread = new Thread(futureTask);
@@ -117,7 +117,7 @@ public class ConsumerThread extends Thread {
                                     }
                                 } else {
                                     // direct run
-                                    mqResult = consumerHandler.consume(msg.getData());
+                                    mqResult = iMqConsumer.consume(msg.getData());
                                 }
 
                                 if (mqResult == null) {

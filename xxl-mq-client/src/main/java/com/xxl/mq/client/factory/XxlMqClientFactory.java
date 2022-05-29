@@ -187,7 +187,7 @@ public class XxlMqClientFactory  {
                                     messageList.addAll(otherMessageList);
                                 }
 
-                                // save
+                                // 通过rpc进行发送，即发送给broker
                                 xxlMqBroker.addMessages(messageList);
                             }
                         } catch (Exception e) {
