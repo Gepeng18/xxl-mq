@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 /**
  * 封装返回
- * 
- * @author xuxueli 2015-3-29 18:27:32
+ *
  * @param <T>
+ * @author xuxueli 2015-3-29 18:27:32
  */
 public class ReturnT<T> implements Serializable {
 	public static final long serialVersionUID = 42L;
@@ -21,11 +21,14 @@ public class ReturnT<T> implements Serializable {
 	private String msg;
 	private T data;
 
-	public ReturnT(){}
+	public ReturnT() {
+	}
+
 	public ReturnT(int code, String msg) {
 		this.code = code;
 		this.msg = msg;
 	}
+
 	public ReturnT(T data) {
 		this.code = SUCCESS_CODE;
 		this.data = data;
@@ -34,12 +37,15 @@ public class ReturnT<T> implements Serializable {
 	public int getCode() {
 		return code;
 	}
+
 	public void setCode(int code) {
 		this.code = code;
 	}
+
 	public String getMsg() {
 		return msg;
 	}
+
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}

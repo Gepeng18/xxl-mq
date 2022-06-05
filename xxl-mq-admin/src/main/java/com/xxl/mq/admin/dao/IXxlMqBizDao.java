@@ -12,14 +12,14 @@ import java.util.List;
 @Mapper
 public interface IXxlMqBizDao {
 
-    public List<XxlMqBiz> findAll();
+	public List<XxlMqBiz> findAll();
 
-    public XxlMqBiz load(@Param("id") int id);
+	public XxlMqBiz load(@Param("id") int id);
 
-    public int add(XxlMqBiz xxlMqBiz);
+	public int add(XxlMqBiz xxlMqBiz);
 
-    public int update(@Param("xxlMqBiz") XxlMqBiz xxlMqBiz);
+	public int update(@Param("xxlMqBiz") XxlMqBiz xxlMqBiz);
 
-    public int delete(@Param("id") int id);
+	public int delete(@Param("id") int id);
 
 }

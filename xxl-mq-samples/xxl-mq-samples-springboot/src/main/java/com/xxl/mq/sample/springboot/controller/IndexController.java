@@ -12,19 +12,20 @@ import java.util.Date;
 
 /**
  * index controller
+ *
  * @author xuxueli 2015-12-19 16:13:16
  */
 @Controller
 public class IndexController {
 
 	@RequestMapping("/")
-	public String index(){
+	public String index() {
 		return "index";
 	}
 
 	@RequestMapping("/produce")
 	@ResponseBody
-	public String produce(int type){
+	public String produce(int type) {
 
 		String topic = "topic_1";
 		String data = "时间戳:" + System.currentTimeMillis();
@@ -67,10 +68,10 @@ public class IndexController {
 			int msgNum = 10000;
 			long start = System.currentTimeMillis();
 			for (int i = 0; i < msgNum; i++) {
-				XxlMqProducer.produce(new XxlMqMessage("topic_1", "No:"+i));
+				XxlMqProducer.produce(new XxlMqMessage("topic_1", "No:" + i));
 			}
 			long end = System.currentTimeMillis();
-			return "Cost = " + (end-start);
+			return "Cost = " + (end - start);
 
 		} else {
 			return "Type Error.";
@@ -80,9 +81,9 @@ public class IndexController {
 	}
 
 	@ExceptionHandler({Exception.class})
-     public String exception(Exception e) {
-         e.printStackTrace();
-         return e.getMessage();
-     }
+	public String exception(Exception e) {
+		e.printStackTrace();
+		return e.getMessage();
+	}
 
 }

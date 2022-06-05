@@ -10,14 +10,14 @@ import java.util.List;
  */
 public interface IXxlMqBizService {
 
-    public List<XxlMqBiz> findAll();
+	public List<XxlMqBiz> findAll();
 
-    public XxlMqBiz load(int id);
+	public XxlMqBiz load(int id);
 
-    public ReturnT<String> add(XxlMqBiz xxlMqBiz);
+	public ReturnT<String> add(XxlMqBiz xxlMqBiz);
 
-    public ReturnT<String> update(XxlMqBiz xxlMqBiz);
+	public ReturnT<String> update(XxlMqBiz xxlMqBiz);
 
-    public ReturnT<String> delete(int id);
+	public ReturnT<String> delete(int id);
 
 }

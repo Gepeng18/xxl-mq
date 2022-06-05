@@ -25,7 +25,7 @@ public class CookieUtil {
 	 * @param ifRemember
 	 */
 	public static void set(HttpServletResponse response, String key, String value, boolean ifRemember) {
-		int age = ifRemember?COOKIE_MAX_AGE:-1;
+		int age = ifRemember ? COOKIE_MAX_AGE : -1;
 		set(response, key, value, null, COOKIE_PATH, age, true);
 	}
 

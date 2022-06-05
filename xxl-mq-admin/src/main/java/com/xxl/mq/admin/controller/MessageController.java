@@ -17,7 +17,8 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * Base 
+ * Base
+ *
  * @author xuxueli 2016-3-19 13:56:28
  */
 @Controller
@@ -28,28 +29,28 @@ public class MessageController {
 	private IXxlMqMessageService xxlMqMessageService;
 
 	@RequestMapping("")
-	public String index(Model model, String topic){
+	public String index(Model model, String topic) {
 
 		model.addAttribute("status", XxlMqMessageStatus.values());
 		model.addAttribute("topic", topic);
 
 		return "message/message.index";
 	}
-	
+
 	@RequestMapping("/pageList")
 	@ResponseBody
 	public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,
 										@RequestParam(required = false, defaultValue = "10") int length,
 										String topic,
 										String status,
-										String filterTime){
+										String filterTime) {
 
 		// parse param
 		Date addTimeStart = null;
 		Date addTimeEnd = null;
-		if (filterTime!=null && filterTime.trim().length()>0) {
+		if (filterTime != null && filterTime.trim().length() > 0) {
 			String[] temp = filterTime.split(" - ");
-			if (temp!=null && temp.length == 2) {
+			if (temp != null && temp.length == 2) {
 				addTimeStart = DateUtil.parseDateTime(temp[0]);
 				addTimeEnd = DateUtil.parseDateTime(temp[1]);
 			}
@@ -57,45 +58,45 @@ public class MessageController {
 
 		return xxlMqMessageService.pageList(start, length, topic, status, addTimeStart, addTimeEnd);
 	}
-	
+
 	@RequestMapping("/delete")
 	@ResponseBody
-	public ReturnT<String> delete(int id){
+	public ReturnT<String> delete(int id) {
 		return xxlMqMessageService.delete(id);
 	}
 
 	@RequestMapping("/update")
 	@ResponseBody
 	public ReturnT<String> update(long id,
-                                  String topic,
-                                  String group,
-                                  String data,
-                                  String status,
-                                  @RequestParam(required = false, defaultValue = "0") int retryCount,
-                                  @RequestParam(required = false, defaultValue = "0") long shardingId,
-                                  @RequestParam(required = false, defaultValue = "0") int timeout,
-                                  String effectTime){
+								  String topic,
+								  String group,
+								  String data,
+								  String status,
+								  @RequestParam(required = false, defaultValue = "0") int retryCount,
+								  @RequestParam(required = false, defaultValue = "0") long shardingId,
+								  @RequestParam(required = false, defaultValue = "0") int timeout,
+								  String effectTime) {
 
 		// effectTime
 		Date effectTimeObj = null;
-		if (effectTime!=null && effectTime.trim().length()>0) {
+		if (effectTime != null && effectTime.trim().length() > 0) {
 			effectTimeObj = DateUtil.parseDateTime(effectTime);
 			if (effectTimeObj == null) {
 				return new ReturnT<String>(ReturnT.FAIL_CODE, "生效时间格式非法");
 			}
 		}
 
-        // message
-        XxlMqMessage message = new XxlMqMessage();
-        message.setId(id);
-        message.setTopic(topic);
-        message.setGroup(group);
-        message.setData(data);
-        message.setStatus(status);
-        message.setRetryCount(retryCount);
-        message.setShardingId(shardingId);
-        message.setTimeout(timeout);
-        message.setEffectTime(effectTimeObj);
+		// message
+		XxlMqMessage message = new XxlMqMessage();
+		message.setId(id);
+		message.setTopic(topic);
+		message.setGroup(group);
+		message.setData(data);
+		message.setStatus(status);
+		message.setRetryCount(retryCount);
+		message.setShardingId(shardingId);
+		message.setTimeout(timeout);
+		message.setEffectTime(effectTimeObj);
 
 		return xxlMqMessageService.update(message);
 	}
@@ -103,41 +104,41 @@ public class MessageController {
 	@RequestMapping("/add")
 	@ResponseBody
 	public ReturnT<String> add(String topic,
-                               String group,
-                               String data,
-                               String status,
-                               @RequestParam(required = false, defaultValue = "0") int retryCount,
-                               @RequestParam(required = false, defaultValue = "0") long shardingId,
-                               @RequestParam(required = false, defaultValue = "0") int timeout,
-                               String effectTime){
+							   String group,
+							   String data,
+							   String status,
+							   @RequestParam(required = false, defaultValue = "0") int retryCount,
+							   @RequestParam(required = false, defaultValue = "0") long shardingId,
+							   @RequestParam(required = false, defaultValue = "0") int timeout,
+							   String effectTime) {
 
-        // effectTime
-        Date effectTimeObj = null;
-		if (effectTime!=null && effectTime.trim().length()>0) {
+		// effectTime
+		Date effectTimeObj = null;
+		if (effectTime != null && effectTime.trim().length() > 0) {
 			effectTimeObj = DateUtil.parseDateTime(effectTime);
 			if (effectTimeObj == null) {
 				return new ReturnT<String>(ReturnT.FAIL_CODE, "生效时间格式非法");
 			}
 		}
 
-        // message
-        XxlMqMessage message = new XxlMqMessage();
-        message.setTopic(topic);
-        message.setGroup(group);
-        message.setData(data);
-        message.setStatus(status);
-        message.setRetryCount(retryCount);
-        message.setShardingId(shardingId);
-        message.setTimeout(timeout);
-        message.setEffectTime(effectTimeObj);
+		// message
+		XxlMqMessage message = new XxlMqMessage();
+		message.setTopic(topic);
+		message.setGroup(group);
+		message.setData(data);
+		message.setStatus(status);
+		message.setRetryCount(retryCount);
+		message.setShardingId(shardingId);
+		message.setTimeout(timeout);
+		message.setEffectTime(effectTimeObj);
 
 		return xxlMqMessageService.add(message);
 	}
 
-    @RequestMapping("/clearMessage")
-    @ResponseBody
-    public ReturnT<String> clearMessage(String topic, String status, int type){
-	    return xxlMqMessageService.clearMessage(topic, status, type);
-    }
+	@RequestMapping("/clearMessage")
+	@ResponseBody
+	public ReturnT<String> clearMessage(String topic, String status, int type) {
+		return xxlMqMessageService.clearMessage(topic, status, type);
+	}
 
 }

@@ -24,159 +24,160 @@ import java.util.concurrent.TimeoutException;
  * Created by xuxueli on 16/9/10.
  */
 public class ConsumerThread extends Thread {
-    private final static Logger logger = LoggerFactory.getLogger(ConsumerThread.class);
+	private final static Logger logger = LoggerFactory.getLogger(ConsumerThread.class);
 
-    private IMqConsumer iMqConsumer;
-    private MqConsumer mqConsumer;
+	private IMqConsumer iMqConsumer;
+	private MqConsumer mqConsumer;
 
-    private String uuid;
+	private String uuid;
 
-    public ConsumerThread(IMqConsumer iMqConsumer) {
-        this.iMqConsumer = iMqConsumer;
-        this.mqConsumer = iMqConsumer.getClass().getAnnotation(MqConsumer.class);
+	public ConsumerThread(IMqConsumer iMqConsumer) {
+		this.iMqConsumer = iMqConsumer;
+		this.mqConsumer = iMqConsumer.getClass().getAnnotation(MqConsumer.class);
 
-        this.uuid = UUID.randomUUID().toString().replaceAll("-", "");
-    }
+		this.uuid = UUID.randomUUID().toString().replaceAll("-", "");
+	}
 
-    public MqConsumer getMqConsumer() {
-        return mqConsumer;
-    }
-    public String getUuid() {
-        return uuid;
-    }
+	public MqConsumer getMqConsumer() {
+		return mqConsumer;
+	}
 
-    // consumer的处理逻辑
-    @Override
-    public void run() {
+	public String getUuid() {
+		return uuid;
+	}
 
-        int waitTim = 0;
+	// consumer的处理逻辑
+	@Override
+	public void run() {
 
-        while (!XxlMqClientFactory.clientFactoryPoolStoped) {
-            try {
-                // check active
-                ConsumerRegistryHelper.ActiveInfo activeInfo = XxlMqClientFactory.getConsumerRegistryHelper().isActice(this);
-                logger.debug(">>>>>>>>>>> xxl-mq, consumer active check, topic:{}, group:{}, ActiveInfo={}", mqConsumer.topic(), mqConsumer.group(), activeInfo);
+		int waitTim = 0;
 
-                if (activeInfo != null) {
+		while (!XxlMqClientFactory.clientFactoryPoolStoped) {
+			try {
+				// check active
+				ConsumerRegistryHelper.ActiveInfo activeInfo = XxlMqClientFactory.getConsumerRegistryHelper().isActice(this);
+				logger.debug(">>>>>>>>>>> xxl-mq, consumer active check, topic:{}, group:{}, ActiveInfo={}", mqConsumer.topic(), mqConsumer.group(), activeInfo);
 
-                    // pullNewMessage
-                    List<XxlMqMessage> messageList = XxlMqClientFactory.getXxlMqBroker().pullNewMessage(mqConsumer.topic(), mqConsumer.group(), activeInfo.rank, activeInfo.total, 100);
-                    if (messageList != null && messageList.size() > 0) {
+				if (activeInfo != null) {
 
-                        // reset wait time
-                        if (mqConsumer.transaction()) {
-                            waitTim = 0;    // transaction message status timely updated by lock, will not repeat pull
-                        } else {
-                            waitTim = 1;    // no-transaction message status delay updated by callback, may be repeat, need wail for callback
-                        }
+					// pullNewMessage
+					List<XxlMqMessage> messageList = XxlMqClientFactory.getXxlMqBroker().pullNewMessage(mqConsumer.topic(), mqConsumer.group(), activeInfo.rank, activeInfo.total, 100);
+					if (messageList != null && messageList.size() > 0) {
 
-                        for (final XxlMqMessage msg : messageList) {
+						// reset wait time
+						if (mqConsumer.transaction()) {
+							waitTim = 0;    // transaction message status timely updated by lock, will not repeat pull
+						} else {
+							waitTim = 1;    // no-transaction message status delay updated by callback, may be repeat, need wail for callback
+						}
 
-                            // check active twice
-                            ConsumerRegistryHelper.ActiveInfo newActiveInfo = XxlMqClientFactory.getConsumerRegistryHelper().isActice(this);
-                            if (!(newActiveInfo != null && newActiveInfo.rank == activeInfo.rank && newActiveInfo.total == activeInfo.total)) {
-                                break;
-                            }
+						for (final XxlMqMessage msg : messageList) {
 
-                            // lock message, for transaction
-                            if (mqConsumer.transaction()) {
-                                String appendLog_lock = LogHelper.makeLog(
-                                        "锁定消息",
-                                        ("消费者信息="+newActiveInfo.toString()
-                                                +"；<br>消费者IP="+IpUtil.getIp())
-                                );
-                                int lockRet = XxlMqClientFactory.getXxlMqBroker().lockMessage(msg.getId(), appendLog_lock);
-                                if (lockRet < 1) {
-                                    continue;
-                                }
-                            }
+							// check active twice
+							ConsumerRegistryHelper.ActiveInfo newActiveInfo = XxlMqClientFactory.getConsumerRegistryHelper().isActice(this);
+							if (!(newActiveInfo != null && newActiveInfo.rank == activeInfo.rank && newActiveInfo.total == activeInfo.total)) {
+								break;
+							}
 
-                            // consume message
-                            MqResult mqResult = null;
-                            try {
+							// lock message, for transaction
+							if (mqConsumer.transaction()) {
+								String appendLog_lock = LogHelper.makeLog(
+										"锁定消息",
+										("消费者信息=" + newActiveInfo.toString()
+												+ "；<br>消费者IP=" + IpUtil.getIp())
+								);
+								int lockRet = XxlMqClientFactory.getXxlMqBroker().lockMessage(msg.getId(), appendLog_lock);
+								if (lockRet < 1) {
+									continue;
+								}
+							}
 
-                                if (msg.getTimeout() > 0) {
-                                    // limit timeout
-                                    Thread futureThread = null;
-                                    try {
-                                        FutureTask<MqResult> futureTask = new FutureTask<MqResult>(new Callable<MqResult>() {
-                                            @Override
-                                            public MqResult call() throws Exception {
-                                                return iMqConsumer.consume(msg.getData());
-                                            }
-                                        });
-                                        futureThread = new Thread(futureTask);
-                                        futureThread.start();
+							// consume message
+							MqResult mqResult = null;
+							try {
 
-                                        mqResult = futureTask.get(msg.getTimeout(), TimeUnit.SECONDS);
-                                    } catch (TimeoutException e) {
-                                        logger.error(e.getMessage(), e);
-                                        mqResult = new MqResult(MqResult.FAIL_CODE, "Timeout:" + e.getMessage());
-                                    } finally {
-                                        futureThread.interrupt();
-                                    }
-                                } else {
-                                    // direct run
-                                    mqResult = iMqConsumer.consume(msg.getData());
-                                }
+								if (msg.getTimeout() > 0) {
+									// limit timeout
+									Thread futureThread = null;
+									try {
+										FutureTask<MqResult> futureTask = new FutureTask<MqResult>(new Callable<MqResult>() {
+											@Override
+											public MqResult call() throws Exception {
+												return iMqConsumer.consume(msg.getData());
+											}
+										});
+										futureThread = new Thread(futureTask);
+										futureThread.start();
 
-                                if (mqResult == null) {
-                                    mqResult = MqResult.FAIL;
-                                }
-                            } catch (Exception e) {
-                                logger.error(e.getMessage(), e);
-                                String errorMsg = ThrowableUtil.toString(e);
-                                mqResult = new MqResult(MqResult.FAIL_CODE, errorMsg);
-                            }
+										mqResult = futureTask.get(msg.getTimeout(), TimeUnit.SECONDS);
+									} catch (TimeoutException e) {
+										logger.error(e.getMessage(), e);
+										mqResult = new MqResult(MqResult.FAIL_CODE, "Timeout:" + e.getMessage());
+									} finally {
+										futureThread.interrupt();
+									}
+								} else {
+									// direct run
+									mqResult = iMqConsumer.consume(msg.getData());
+								}
 
-                            // log
-                            String appendLog_consume = null;
-                            if (mqConsumer.transaction()) {
-                                appendLog_consume = LogHelper.makeLog(
-                                        "消费消息",
-                                        ("消费结果="+(mqResult.isSuccess()?"成功":"失败")
-                                                +"；<br>消费日志="+mqResult.getLog())
-                                );
-                            } else {
-                                appendLog_consume = LogHelper.makeLog(
-                                        "消费消息",
-                                        ("消费结果="+(mqResult.isSuccess()?"成功":"失败")
-                                                +"；<br>消费者信息="+activeInfo.toString()
-                                                +"；<br>消费者IP="+IpUtil.getIp()
-                                                +"；<br>消费日志="+mqResult.getLog())
-                                );
-                            }
+								if (mqResult == null) {
+									mqResult = MqResult.FAIL;
+								}
+							} catch (Exception e) {
+								logger.error(e.getMessage(), e);
+								String errorMsg = ThrowableUtil.toString(e);
+								mqResult = new MqResult(MqResult.FAIL_CODE, errorMsg);
+							}
 
-                            // callback
-                            msg.setStatus(mqResult.isSuccess()? XxlMqMessageStatus.SUCCESS.name():XxlMqMessageStatus.FAIL.name());
-                            msg.setLog(appendLog_consume);
-                            XxlMqClientFactory.callbackMessage(msg);
+							// log
+							String appendLog_consume = null;
+							if (mqConsumer.transaction()) {
+								appendLog_consume = LogHelper.makeLog(
+										"消费消息",
+										("消费结果=" + (mqResult.isSuccess() ? "成功" : "失败")
+												+ "；<br>消费日志=" + mqResult.getLog())
+								);
+							} else {
+								appendLog_consume = LogHelper.makeLog(
+										"消费消息",
+										("消费结果=" + (mqResult.isSuccess() ? "成功" : "失败")
+												+ "；<br>消费者信息=" + activeInfo.toString()
+												+ "；<br>消费者IP=" + IpUtil.getIp()
+												+ "；<br>消费日志=" + mqResult.getLog())
+								);
+							}
 
-                            logger.info(">>>>>>>>>>> xxl-mq, consumer finish,  topic:{}, group:{}, ActiveInfo={}", mqConsumer.topic(), mqConsumer.group(), activeInfo.toString());
-                        }
+							// callback
+							msg.setStatus(mqResult.isSuccess() ? XxlMqMessageStatus.SUCCESS.name() : XxlMqMessageStatus.FAIL.name());
+							msg.setLog(appendLog_consume);
+							XxlMqClientFactory.callbackMessage(msg);
 
-                    } else {
-                        waitTim = (waitTim+10)<=60?(waitTim+10):60;
-                    }
-                } else {
-                    waitTim = 2;
-                }
+							logger.info(">>>>>>>>>>> xxl-mq, consumer finish,  topic:{}, group:{}, ActiveInfo={}", mqConsumer.topic(), mqConsumer.group(), activeInfo.toString());
+						}
 
-            } catch (Exception e) {
-                if (!XxlMqClientFactory.clientFactoryPoolStoped) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
+					} else {
+						waitTim = (waitTim + 10) <= 60 ? (waitTim + 10) : 60;
+					}
+				} else {
+					waitTim = 2;
+				}
 
-            // wait
-            try {
-                TimeUnit.SECONDS.sleep(waitTim);
-            } catch (Exception e) {
-                if (!XxlMqClientFactory.clientFactoryPoolStoped) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
+			} catch (Exception e) {
+				if (!XxlMqClientFactory.clientFactoryPoolStoped) {
+					logger.error(e.getMessage(), e);
+				}
+			}
 
-        }
-    }
+			// wait
+			try {
+				TimeUnit.SECONDS.sleep(waitTim);
+			} catch (Exception e) {
+				if (!XxlMqClientFactory.clientFactoryPoolStoped) {
+					logger.error(e.getMessage(), e);
+				}
+			}
+
+		}
+	}
 }

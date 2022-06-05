@@ -12,23 +12,24 @@ import java.util.List;
 @Mapper
 public interface IXxlMqTopicDao {
 
-    public List<XxlMqTopic> pageList(@Param("offset") int offset,
-                                       @Param("pagesize") int pagesize,
-                                       @Param("bizId") int bizId,
-                                       @Param("topic") String topic);
-    public int pageListCount(@Param("offset") int offset,
-                             @Param("pagesize") int pagesize,
-                             @Param("bizId") int bizId,
-                             @Param("topic") String topic);
+	public List<XxlMqTopic> pageList(@Param("offset") int offset,
+									 @Param("pagesize") int pagesize,
+									 @Param("bizId") int bizId,
+									 @Param("topic") String topic);
 
-    public XxlMqTopic load(@Param("topic") String topic);
+	public int pageListCount(@Param("offset") int offset,
+							 @Param("pagesize") int pagesize,
+							 @Param("bizId") int bizId,
+							 @Param("topic") String topic);
 
-    public int add(@Param("xxlMqTopic") XxlMqTopic xxlMqTopic);
+	public XxlMqTopic load(@Param("topic") String topic);
 
-    public int update(@Param("xxlMqTopic") XxlMqTopic xxlMqTopic);
+	public int add(@Param("xxlMqTopic") XxlMqTopic xxlMqTopic);
 
-    public int delete(@Param("topic") String topic);
+	public int update(@Param("xxlMqTopic") XxlMqTopic xxlMqTopic);
 
-    public List<XxlMqTopic> findAlarmByTopic(@Param("topics") List<String> topics);
+	public int delete(@Param("topic") String topic);
+
+	public List<XxlMqTopic> findAlarmByTopic(@Param("topics") List<String> topics);
 
 }

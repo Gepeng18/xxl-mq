@@ -14,24 +14,24 @@ import java.util.Map;
  */
 public interface XxlCommonRegistryService {
 
-    /**
-     * refresh registry-value, check update and broacase
-     */
-    ReturnT<String> registry(String accessToken, List<XxlCommonRegistryData> xxlCommonRegistryDataList);
+	/**
+	 * refresh registry-value, check update and broacase
+	 */
+	ReturnT<String> registry(String accessToken, List<XxlCommonRegistryData> xxlCommonRegistryDataList);
 
-    /**
-     * remove registry-value, check update and broacase
-     */
-    ReturnT<String> remove(String accessToken, List<XxlCommonRegistryData> xxlCommonRegistryDataList);
+	/**
+	 * remove registry-value, check update and broacase
+	 */
+	ReturnT<String> remove(String accessToken, List<XxlCommonRegistryData> xxlCommonRegistryDataList);
 
-    /**
-     * discovery registry-data, read file
-     */
-    ReturnT<Map<String, List<String>>> discovery(String accessToken, List<String> keys);
+	/**
+	 * discovery registry-data, read file
+	 */
+	ReturnT<Map<String, List<String>>> discovery(String accessToken, List<String> keys);
 
-    /**
-     * monitor update
-     */
-    DeferredResult<ReturnT<String>> monitor(String accessToken, List<String> keys);
+	/**
+	 * monitor update
+	 */
+	DeferredResult<ReturnT<String>> monitor(String accessToken, List<String> keys);
 
 }

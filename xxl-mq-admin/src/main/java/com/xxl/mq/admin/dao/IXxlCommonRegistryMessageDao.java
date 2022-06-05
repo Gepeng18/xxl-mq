@@ -12,10 +12,10 @@ import java.util.List;
 @Mapper
 public interface IXxlCommonRegistryMessageDao {
 
-    public int add(@Param("xxlCommonRegistryMessage") XxlCommonRegistryMessage xxlCommonRegistryMessage);
+	public int add(@Param("xxlCommonRegistryMessage") XxlCommonRegistryMessage xxlCommonRegistryMessage);
 
-    public List<XxlCommonRegistryMessage> findMessage(@Param("excludeIds") List<Integer> excludeIds);
+	public List<XxlCommonRegistryMessage> findMessage(@Param("excludeIds") List<Integer> excludeIds);
 
-    public int cleanMessage(@Param("messageTimeout") int messageTimeout);
+	public int cleanMessage(@Param("messageTimeout") int messageTimeout);
 
 }

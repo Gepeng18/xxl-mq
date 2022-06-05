@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 @MqConsumer(topic = "topic_2")
 @Service
 public class Demo2MqComsumer implements IMqConsumer {
-    private Logger logger = LoggerFactory.getLogger(Demo2MqComsumer.class);
+	private Logger logger = LoggerFactory.getLogger(Demo2MqComsumer.class);
 
-    @Override
-    public MqResult consume(String data) throws Exception {
-        logger.info("[Demo2MqComsumer] 消费一条消息:{}", data);
-        return MqResult.SUCCESS;
-    }
+	@Override
+	public MqResult consume(String data) throws Exception {
+		logger.info("[Demo2MqComsumer] 消费一条消息:{}", data);
+		return MqResult.SUCCESS;
+	}
 
 }

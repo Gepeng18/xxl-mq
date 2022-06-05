@@ -16,19 +16,18 @@ import java.util.Map;
  * @author xuxueli 2015-5-5 17:52:43
  */
 public class DateUtil {
-	private static Logger logger = LoggerFactory.getLogger(DateUtil.class);
-
 	private static final String DATE_FORMAT = "yyyy-MM-dd";
 	private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-
+	private static Logger logger = LoggerFactory.getLogger(DateUtil.class);
 	private static ThreadLocal<Map<String, DateFormat>> dateFormatThreadLocal = new ThreadLocal<Map<String, DateFormat>>();
+
 	private static DateFormat getDateFormat(String pattern) {
-		if (pattern==null || pattern.trim().length()==0) {
+		if (pattern == null || pattern.trim().length() == 0) {
 			throw new IllegalArgumentException("pattern cannot be empty.");
 		}
 
 		Map<String, DateFormat> dateFormatMap = dateFormatThreadLocal.get();
-		if(dateFormatMap!=null && dateFormatMap.containsKey(pattern)){
+		if (dateFormatMap != null && dateFormatMap.containsKey(pattern)) {
 			return dateFormatMap.get(pattern);
 		}
 
@@ -45,7 +44,7 @@ public class DateUtil {
 
 	/**
 	 * format datetime. like "yyyy-MM-dd"
-	 * 
+	 *
 	 * @param date
 	 * @return
 	 * @throws ParseException
@@ -56,7 +55,7 @@ public class DateUtil {
 
 	/**
 	 * format date. like "yyyy-MM-dd HH:mm:ss"
-	 * 
+	 *
 	 * @param date
 	 * @return
 	 * @throws ParseException
@@ -67,7 +66,7 @@ public class DateUtil {
 
 	/**
 	 * format date
-	 * 
+	 *
 	 * @param date
 	 * @param patten
 	 * @return
@@ -79,18 +78,18 @@ public class DateUtil {
 
 	/**
 	 * parse date string, like "yyyy-MM-dd HH:mm:s"
-	 * 
+	 *
 	 * @param dateString
 	 * @return
 	 * @throws ParseException
 	 */
-	public static Date parseDate(String dateString){
+	public static Date parseDate(String dateString) {
 		return parse(dateString, DATE_FORMAT);
 	}
 
 	/**
 	 * parse datetime string, like "yyyy-MM-dd HH:mm:ss"
-	 * 
+	 *
 	 * @param dateString
 	 * @return
 	 * @throws ParseException
@@ -101,7 +100,7 @@ public class DateUtil {
 
 	/**
 	 * parse date
-	 * 
+	 *
 	 * @param dateString
 	 * @param pattern
 	 * @return

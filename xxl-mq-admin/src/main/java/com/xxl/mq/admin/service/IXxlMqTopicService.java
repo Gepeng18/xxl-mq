@@ -10,15 +10,15 @@ import java.util.Map;
  */
 public interface IXxlMqTopicService {
 
-    public Map<String, Object> pageList(int start, int length, int bizId, String topic);
+	public Map<String, Object> pageList(int start, int length, int bizId, String topic);
 
-    public XxlMqTopic load(String topic);
+	public XxlMqTopic load(String topic);
 
-    public ReturnT<String> add(XxlMqTopic xxlMqTopic);
+	public ReturnT<String> add(XxlMqTopic xxlMqTopic);
 
-    public ReturnT<String> update(XxlMqTopic xxlMqTopic);
+	public ReturnT<String> update(XxlMqTopic xxlMqTopic);
 
-    public ReturnT<String> delete(String topic);
+	public ReturnT<String> delete(String topic);
 
 
 }

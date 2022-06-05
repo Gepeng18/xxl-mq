@@ -22,46 +22,46 @@ import java.util.Map;
 @RequestMapping("/topic")
 public class TopicController {
 
-    @Resource
-    private IXxlMqTopicService xxlMqTopicService;
-    @Resource
-    private IXxlMqBizService xxlMqBizService;
+	@Resource
+	private IXxlMqTopicService xxlMqTopicService;
+	@Resource
+	private IXxlMqBizService xxlMqBizService;
 
 
-    @RequestMapping("")
-    public String index(Model model){
+	@RequestMapping("")
+	public String index(Model model) {
 
-        List<XxlMqBiz> bizList = xxlMqBizService.findAll();
-        model.addAttribute("bizList", bizList);
+		List<XxlMqBiz> bizList = xxlMqBizService.findAll();
+		model.addAttribute("bizList", bizList);
 
-        return "topic/topic.index";
-    }
+		return "topic/topic.index";
+	}
 
-    @RequestMapping("/pageList")
-    @ResponseBody
-    public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,
-                                        @RequestParam(required = false, defaultValue = "10") int length,
-                                        int bizId,
-                                        String topic){
-        return xxlMqTopicService.pageList(start, length, bizId, topic);
-    }
+	@RequestMapping("/pageList")
+	@ResponseBody
+	public Map<String, Object> pageList(@RequestParam(required = false, defaultValue = "0") int start,
+										@RequestParam(required = false, defaultValue = "10") int length,
+										int bizId,
+										String topic) {
+		return xxlMqTopicService.pageList(start, length, bizId, topic);
+	}
 
-    @RequestMapping("/delete")
-    @ResponseBody
-    public ReturnT<String> delete(String topic){
-        return xxlMqTopicService.delete(topic);
-    }
+	@RequestMapping("/delete")
+	@ResponseBody
+	public ReturnT<String> delete(String topic) {
+		return xxlMqTopicService.delete(topic);
+	}
 
-    @RequestMapping("/update")
-    @ResponseBody
-    public ReturnT<String> update(XxlMqTopic xxlMqTopic){
-        return xxlMqTopicService.update(xxlMqTopic);
-    }
+	@RequestMapping("/update")
+	@ResponseBody
+	public ReturnT<String> update(XxlMqTopic xxlMqTopic) {
+		return xxlMqTopicService.update(xxlMqTopic);
+	}
 
-    @RequestMapping("/add")
-    @ResponseBody
-    public ReturnT<String> add(XxlMqTopic xxlMqTopic){
-        return xxlMqTopicService.add(xxlMqTopic);
-    }
+	@RequestMapping("/add")
+	@ResponseBody
+	public ReturnT<String> add(XxlMqTopic xxlMqTopic) {
+		return xxlMqTopicService.add(xxlMqTopic);
+	}
 
 }

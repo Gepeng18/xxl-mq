@@ -22,43 +22,28 @@ import java.math.BigInteger;
 public class PermissionInterceptor extends HandlerInterceptorAdapter implements InitializingBean {
 
 
-    // ---------------------- init ----------------------
-
-    @Value("${xxl.mq.login.username}")
-    private String username;
-    @Value("${xxl.mq.login.password}")
-    private String password;
-    @Override
-    public void afterPropertiesSet() throws Exception {
-
-        // valid
-        if (username==null || username.trim().length()==0 || password==null || password.trim().length()==0) {
-            throw new RuntimeException("权限账号密码不可为空");
-        }
-
-        // login token
-        String tokenTmp = DigestUtils.md5DigestAsHex(String.valueOf(username + "_" + password).getBytes());		//.getBytes("UTF-8")
-        tokenTmp = new BigInteger(1, tokenTmp.getBytes()).toString(16);
-
-        LOGIN_IDENTITY_TOKEN = tokenTmp;
-    }
-
-    // ---------------------- tool ----------------------
+	// ---------------------- init ----------------------
 
 	public static final String LOGIN_IDENTITY_KEY = "XXL_MQ_LOGIN_IDENTITY";
 	private static String LOGIN_IDENTITY_TOKEN;
+	@Value("${xxl.mq.login.username}")
+	private String username;
+
+	// ---------------------- tool ----------------------
+	@Value("${xxl.mq.login.password}")
+	private String password;
 
 	public static String getLoginIdentityToken() {
-        return LOGIN_IDENTITY_TOKEN;
+		return LOGIN_IDENTITY_TOKEN;
 	}
 
-	public static boolean login(HttpServletResponse response, String username, String password, boolean ifRemember){
+	public static boolean login(HttpServletResponse response, String username, String password, boolean ifRemember) {
 
 		// login token
 		String tokenTmp = DigestUtils.md5DigestAsHex(String.valueOf(username + "_" + password).getBytes());
 		tokenTmp = new BigInteger(1, tokenTmp.getBytes()).toString(16);
 
-		if (!getLoginIdentityToken().equals(tokenTmp)){
+		if (!getLoginIdentityToken().equals(tokenTmp)) {
 			return false;
 		}
 
@@ -66,18 +51,33 @@ public class PermissionInterceptor extends HandlerInterceptorAdapter implements 
 		CookieUtil.set(response, LOGIN_IDENTITY_KEY, getLoginIdentityToken(), ifRemember);
 		return true;
 	}
-	public static void logout(HttpServletRequest request, HttpServletResponse response){
+
+	public static void logout(HttpServletRequest request, HttpServletResponse response) {
 		CookieUtil.remove(request, response, LOGIN_IDENTITY_KEY);
 	}
-	public static boolean ifLogin(HttpServletRequest request){
+
+	public static boolean ifLogin(HttpServletRequest request) {
 		String indentityInfo = CookieUtil.getValue(request, LOGIN_IDENTITY_KEY);
-		if (indentityInfo==null || !getLoginIdentityToken().equals(indentityInfo.trim())) {
+		if (indentityInfo == null || !getLoginIdentityToken().equals(indentityInfo.trim())) {
 			return false;
 		}
 		return true;
 	}
 
+	@Override
+	public void afterPropertiesSet() throws Exception {
 
+		// valid
+		if (username == null || username.trim().length() == 0 || password == null || password.trim().length() == 0) {
+			throw new RuntimeException("权限账号密码不可为空");
+		}
+
+		// login token
+		String tokenTmp = DigestUtils.md5DigestAsHex(String.valueOf(username + "_" + password).getBytes());        //.getBytes("UTF-8")
+		tokenTmp = new BigInteger(1, tokenTmp.getBytes()).toString(16);
+
+		LOGIN_IDENTITY_TOKEN = tokenTmp;
+	}
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -87,7 +87,7 @@ public class PermissionInterceptor extends HandlerInterceptorAdapter implements 
 		}
 
 		if (!ifLogin(request)) {
-			HandlerMethod method = (HandlerMethod)handler;
+			HandlerMethod method = (HandlerMethod) handler;
 			PermessionLimit permission = method.getMethodAnnotation(PermessionLimit.class);
 			if (permission == null || permission.limit()) {
 				response.sendRedirect(request.getContextPath() + "/toLogin");
@@ -98,5 +98,5 @@ public class PermissionInterceptor extends HandlerInterceptorAdapter implements 
 
 		return super.preHandle(request, response, handler);
 	}
-	
+
 }

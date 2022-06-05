@@ -22,6 +22,7 @@ import java.util.Map;
 
 /**
  * index controller
+ *
  * @author xuxueli 2015-12-19 16:13:16
  */
 @Controller
@@ -50,7 +51,7 @@ public class IndexController {
 
 
 	@RequestMapping("/toLogin")
-	@PermessionLimit(limit=false)
+	@PermessionLimit(limit = false)
 	public String toLogin(Model model, HttpServletRequest request) {
 		if (PermissionInterceptor.ifLogin(request)) {
 			return "redirect:/";
@@ -58,20 +59,20 @@ public class IndexController {
 		return "login";
 	}
 
-	@RequestMapping(value="login", method=RequestMethod.POST)
+	@RequestMapping(value = "login", method = RequestMethod.POST)
 	@ResponseBody
-	@PermessionLimit(limit=false)
-	public ReturnT<String> loginDo(HttpServletRequest request, HttpServletResponse response, String userName, String password, String ifRemember){
+	@PermessionLimit(limit = false)
+	public ReturnT<String> loginDo(HttpServletRequest request, HttpServletResponse response, String userName, String password, String ifRemember) {
 		// valid
 		if (PermissionInterceptor.ifLogin(request)) {
 			return ReturnT.SUCCESS;
 		}
 
 		// param
-		if (userName==null || userName.trim().length()==0 || password==null || password.trim().length()==0){
+		if (userName == null || userName.trim().length() == 0 || password == null || password.trim().length() == 0) {
 			return new ReturnT<String>(500, "请输入账号密码");
 		}
-		boolean ifRem = (ifRemember!=null && "on".equals(ifRemember))?true:false;
+		boolean ifRem = (ifRemember != null && "on".equals(ifRemember)) ? true : false;
 
 		// do login
 		boolean loginRet = PermissionInterceptor.login(response, userName, password, ifRem);
@@ -81,16 +82,16 @@ public class IndexController {
 		return ReturnT.SUCCESS;
 	}
 
-	@RequestMapping(value="logout", method=RequestMethod.POST)
+	@RequestMapping(value = "logout", method = RequestMethod.POST)
 	@ResponseBody
-	@PermessionLimit(limit=false)
-	public ReturnT<String> logout(HttpServletRequest request, HttpServletResponse response){
+	@PermessionLimit(limit = false)
+	public ReturnT<String> logout(HttpServletRequest request, HttpServletResponse response) {
 		if (PermissionInterceptor.ifLogin(request)) {
 			PermissionInterceptor.logout(request, response);
 		}
 		return ReturnT.SUCCESS;
 	}
-	
+
 	@RequestMapping("/help")
 	public String help() {
 		return "help";

@@ -29,7 +29,7 @@ public class MyWebExceptionResolver implements HandlerExceptionResolver {
 
 		// if json
 		boolean isJson = false;
-		HandlerMethod method = (HandlerMethod)handler;
+		HandlerMethod method = (HandlerMethod) handler;
 		ResponseBody responseBody = method.getMethodAnnotation(ResponseBody.class);
 		if (responseBody != null) {
 			isJson = true;
@@ -43,7 +43,7 @@ public class MyWebExceptionResolver implements HandlerExceptionResolver {
 		if (isJson) {
 			try {
 				response.setContentType("application/json;charset=utf-8");
-				response.getWriter().print("{\"code\":"+errorResult.getCode()+", \"msg\":\""+ errorResult.getMsg() +"\"}");
+				response.getWriter().print("{\"code\":" + errorResult.getCode() + ", \"msg\":\"" + errorResult.getMsg() + "\"}");
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			}

@@ -17,49 +17,49 @@ import java.util.Map;
  */
 public class XxlMqSpringClientFactory implements ApplicationContextAware, DisposableBean {
 
-    // ---------------------- param  ----------------------
+	// ---------------------- param  ----------------------
 
-    private String adminAddress;
-    private String accessToken;
+	private String adminAddress;
+	private String accessToken;
+	// XxlMqClientFactory
+	private XxlMqClientFactory xxlMqClientFactory;
 
-    public void setAdminAddress(String adminAddress) {
-        this.adminAddress = adminAddress;
-    }
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
+	public void setAdminAddress(String adminAddress) {
+		this.adminAddress = adminAddress;
+	}
 
-    // XxlMqClientFactory
-    private XxlMqClientFactory xxlMqClientFactory;
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
+	}
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 
-        // load consumer from spring
-        List<IMqConsumer> consumerList = new ArrayList<>();
+		// load consumer from spring
+		List<IMqConsumer> consumerList = new ArrayList<>();
 
-        Map<String, Object> serviceMap = applicationContext.getBeansWithAnnotation(MqConsumer.class);
-        if (serviceMap!=null && serviceMap.size()>0) {
-            for (Object serviceBean : serviceMap.values()) {
-                if (serviceBean instanceof IMqConsumer) {
-                    consumerList.add((IMqConsumer) serviceBean);
-                }
-            }
-        }
+		Map<String, Object> serviceMap = applicationContext.getBeansWithAnnotation(MqConsumer.class);
+		if (serviceMap != null && serviceMap.size() > 0) {
+			for (Object serviceBean : serviceMap.values()) {
+				if (serviceBean instanceof IMqConsumer) {
+					consumerList.add((IMqConsumer) serviceBean);
+				}
+			}
+		}
 
-        // init
-        xxlMqClientFactory = new XxlMqClientFactory();
+		// init
+		xxlMqClientFactory = new XxlMqClientFactory();
 
-        xxlMqClientFactory.setAdminAddress(adminAddress);
-        xxlMqClientFactory.setAccessToken(accessToken);
-        xxlMqClientFactory.setConsumerList(consumerList);
+		xxlMqClientFactory.setAdminAddress(adminAddress);
+		xxlMqClientFactory.setAccessToken(accessToken);
+		xxlMqClientFactory.setConsumerList(consumerList);
 
-        xxlMqClientFactory.init();
-    }
+		xxlMqClientFactory.init();
+	}
 
-    @Override
-    public void destroy() throws Exception {
-        xxlMqClientFactory.destroy();
-    }
+	@Override
+	public void destroy() throws Exception {
+		xxlMqClientFactory.destroy();
+	}
 
 }

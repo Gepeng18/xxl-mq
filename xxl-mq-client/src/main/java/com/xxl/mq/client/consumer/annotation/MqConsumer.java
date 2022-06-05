@@ -10,22 +10,22 @@ import java.lang.annotation.*;
 @Inherited
 public @interface MqConsumer {
 
-    public static final String DEFAULT_GROUP = "DEFAULT";   // default group
-    public static final String EMPTY_GROUP = "";            // empty group means consume broadcase message, will replace by uuid
+	public static final String DEFAULT_GROUP = "DEFAULT";   // default group
+	public static final String EMPTY_GROUP = "";            // empty group means consume broadcase message, will replace by uuid
 
-    /**
-     * @return
-     */
-    String group() default DEFAULT_GROUP;
+	/**
+	 * @return
+	 */
+	String group() default DEFAULT_GROUP;
 
-    /**
-     * @return
-     */
-    String topic();
+	/**
+	 * @return
+	 */
+	String topic();
 
-    /**
-     * @return
-     */
-    boolean transaction() default true;
+	/**
+	 * @return
+	 */
+	boolean transaction() default true;
 
 }

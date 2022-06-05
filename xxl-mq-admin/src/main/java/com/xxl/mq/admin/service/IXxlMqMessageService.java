@@ -11,18 +11,18 @@ import java.util.Map;
  */
 public interface IXxlMqMessageService {
 
-    public Map<String,Object> pageList(int offset, int pagesize, String topic, String status, Date addTimeStart, Date addTimeEnd);
+	public Map<String, Object> pageList(int offset, int pagesize, String topic, String status, Date addTimeStart, Date addTimeEnd);
 
-    public ReturnT<String> delete(int id);
+	public ReturnT<String> delete(int id);
 
-    public ReturnT<String> update(XxlMqMessage message);
+	public ReturnT<String> update(XxlMqMessage message);
 
-    public ReturnT<String> add(XxlMqMessage message);
+	public ReturnT<String> add(XxlMqMessage message);
 
-    public Map<String,Object> dashboardInfo();
+	public Map<String, Object> dashboardInfo();
 
-    public ReturnT<Map<String,Object>> chartInfo(Date startDate, Date endDate);
+	public ReturnT<Map<String, Object>> chartInfo(Date startDate, Date endDate);
 
-    public ReturnT<String> clearMessage(String topic, String status, int type);
+	public ReturnT<String> clearMessage(String topic, String status, int type);
 
 }

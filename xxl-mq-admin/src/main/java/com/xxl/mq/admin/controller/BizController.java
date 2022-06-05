@@ -18,35 +18,35 @@ import java.util.List;
 @RequestMapping("/biz")
 public class BizController {
 
-    @Resource
-    private IXxlMqBizService xxlMqBizService;
+	@Resource
+	private IXxlMqBizService xxlMqBizService;
 
-    @RequestMapping("")
-    public String index(Model model){
+	@RequestMapping("")
+	public String index(Model model) {
 
-        List<XxlMqBiz> bizList = xxlMqBizService.findAll();
-        model.addAttribute("bizList", bizList);
+		List<XxlMqBiz> bizList = xxlMqBizService.findAll();
+		model.addAttribute("bizList", bizList);
 
-        return "biz/biz.index";
-    }
+		return "biz/biz.index";
+	}
 
-    @RequestMapping("/save")
-    @ResponseBody
-    public ReturnT<String> save(XxlMqBiz xxlMqBiz){
-        return xxlMqBizService.add(xxlMqBiz);
-    }
+	@RequestMapping("/save")
+	@ResponseBody
+	public ReturnT<String> save(XxlMqBiz xxlMqBiz) {
+		return xxlMqBizService.add(xxlMqBiz);
+	}
 
-    @RequestMapping("/update")
-    @ResponseBody
-    public ReturnT<String> update(XxlMqBiz xxlMqBiz){
-        return xxlMqBizService.update(xxlMqBiz);
-    }
+	@RequestMapping("/update")
+	@ResponseBody
+	public ReturnT<String> update(XxlMqBiz xxlMqBiz) {
+		return xxlMqBizService.update(xxlMqBiz);
+	}
 
 
-    @RequestMapping("/remove")
-    @ResponseBody
-    public ReturnT<String> remove(int id){
-        return xxlMqBizService.delete(id);
-    }
+	@RequestMapping("/remove")
+	@ResponseBody
+	public ReturnT<String> remove(int id) {
+		return xxlMqBizService.delete(id);
+	}
 
 }

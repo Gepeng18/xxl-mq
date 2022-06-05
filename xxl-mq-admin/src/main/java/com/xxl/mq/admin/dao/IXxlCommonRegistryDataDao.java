@@ -13,18 +13,18 @@ import java.util.List;
 public interface IXxlCommonRegistryDataDao {
 
 
-    public int refresh(@Param("xxlCommonRegistryData") XxlCommonRegistryData xxlCommonRegistryData);
+	public int refresh(@Param("xxlCommonRegistryData") XxlCommonRegistryData xxlCommonRegistryData);
 
-    public int add(@Param("xxlCommonRegistryData") XxlCommonRegistryData xxlCommonRegistryData);
+	public int add(@Param("xxlCommonRegistryData") XxlCommonRegistryData xxlCommonRegistryData);
 
 
-    public List<XxlCommonRegistryData> findData(@Param("key") String key);
+	public List<XxlCommonRegistryData> findData(@Param("key") String key);
 
-    public int cleanData(@Param("timeout") int timeout);
+	public int cleanData(@Param("timeout") int timeout);
 
-    public int deleteDataValue(@Param("key") String key,
-                               @Param("value") String value);
+	public int deleteDataValue(@Param("key") String key,
+							   @Param("value") String value);
 
-    public int count();
+	public int count();
 
 }

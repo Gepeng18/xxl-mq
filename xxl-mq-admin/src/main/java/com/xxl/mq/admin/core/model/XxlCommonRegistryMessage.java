@@ -7,33 +7,33 @@ import java.util.Date;
  */
 public class XxlCommonRegistryMessage {
 
-    private int id;
-    private String data;
-    private Date addTime;
+	private int id;
+	private String data;
+	private Date addTime;
 
 
-    public int getId() {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public void setId(int id) {
-        this.id = id;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public String getData() {
-        return data;
-    }
+	public String getData() {
+		return data;
+	}
 
-    public void setData(String data) {
-        this.data = data;
-    }
+	public void setData(String data) {
+		this.data = data;
+	}
 
-    public Date getAddTime() {
-        return addTime;
-    }
+	public Date getAddTime() {
+		return addTime;
+	}
 
-    public void setAddTime(Date addTime) {
-        this.addTime = addTime;
-    }
+	public void setAddTime(Date addTime) {
+		this.addTime = addTime;
+	}
 
 }
